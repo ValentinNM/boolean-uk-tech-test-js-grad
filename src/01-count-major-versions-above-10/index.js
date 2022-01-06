@@ -30,35 +30,34 @@ The results should have this structure:
  */
 const fetch = require('node-fetch');
 
-let data = [];
+module.exports = async function countMajorVersionsAbove10() {
+  const res = await fetch(
+    `http://ambush-api.inyourarea.co.uk/ambush/intercept`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        url: 'https://api.npms.io/v2/search/suggestions?q=react',
+        method: 'GET',
+        return_payload: true,
+      }),
+    },
+  );
 
-fetch(`http://ambush-api.inyourarea.co.uk/ambush/intercept`, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    url: "https://api.npms.io/v2/search/suggestions?q=react",
-    method: "GET",
-    return_payload: true
-  })
-})
-  .then(res => res.json())
-  .then(res => {
-    data = res.content;
-    console.log(data);
-  });
-  
+  const data = await res.json();
 
-module.exports = async function countMajorVersionsAbove10(data) {
+  const smth = data.content;
 
   let count = 0;
 
-  for (let i = 0; i < data.length; i++) {
-    if (data[i].version.split('.')[0] > 10) {
+  for (let i = 0; i < smth.length; i++) {
+    const version = smth[i].package.version;
+    if (version.split('.')[0] > 10) {
       count++;
     }
   }
-  
-  return count
+
+  return count;
 };
