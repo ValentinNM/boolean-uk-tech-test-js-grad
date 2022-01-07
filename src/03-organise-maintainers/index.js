@@ -38,9 +38,45 @@ The results should have this structure:
  * NOTE: the parent array and each "packageNames" array should 
  * be in alphabetical order.
  */
+const fetch = require('node-fetch');
 
 module.exports = async function organiseMaintainers() {
-  // TODO
+
+  const res = await fetch(
+    `http://ambush-api.inyourarea.co.uk/ambush/intercept`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        url: 'https://api.npms.io/v2/search/suggestions?q=react',
+        method: 'GET',
+        return_payload: true,
+      }),
+    },
+  );
+
+  const data = await res.json();
+
+  const iNeedData = data.content;
+
+  // get the maintainers & package names
+  for (let i = 0; i < iNeedData.length; i++) {
+    const maintainer = iNeedData[i].package.maintainers;
+    const pkg = iNeedData[i].package.name;
+    console.log({maintainer, pkg });
+    const username = maintainer.username;
+    const packages = maintainer.packageNames;
+  }
+
+  // remove maintainers username duplicates
+
+  // search for the packages by maintainers username in the iNeedData array
+  // and add each package name to the key "packageNames" of the object 
+
+  // sort alphabetically the value of the packageNames key : value(array)
+
 
   return maintainers
 };
