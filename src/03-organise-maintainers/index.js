@@ -41,7 +41,9 @@ The results should have this structure:
 const fetch = require('node-fetch');
 
 module.exports = async function organiseMaintainers() {
-
+  
+  // 1.0 Fetch data with axios
+// -- url: http://ambush-api.inyourarea.co.uk/ambush/intercept
   const res = await fetch(
     `http://ambush-api.inyourarea.co.uk/ambush/intercept`,
     {
@@ -57,22 +59,71 @@ module.exports = async function organiseMaintainers() {
     },
   );
 
-  const data = await res.json();
+  const result = await res.json();
 
-  const iNeedData = data.content;
+  const data = result.content;
+
+// 2.0 Declare a maintainers variable with an empty Array
+
+const maintainers = [];
+
+// 3.0 Create a tracker object
+const tracker = { 
+  username : "",
+  pkgs: []
+}
+
+// 3.1 Loop through data (list of packages)
+// -- Access the name of the package and the array of maintainers
+// for (let i = 0; i < data.length; i++) {
+//   const packageName = data[i].name;
+//   const maintainers = data[i].maintainers;
+//   console.log({packageName, maintainers});
+  // 3.2 Loop through the array of maintainers
+  // -- Check the tracker object in step 3.0
+  // -- IF the username EXISTS add the name of the package from step 3.1
+  // -- IF the username DOES NOT EXIST store the username with an array and the name of the package from step 3.1
+
+  // Output: {
+  //   gaearon: ["react", ...packageNames],
+  //   acdlite: ["react", ...packageNames],
+  // }
+
+  // for(let j = 0; j < maintainers.length; j++){ 
+
+  //   const username = maintainers[i].username
+  //   console.log({username})
+
+    // tracker[username]= { 
+    //   username : username,
+    //   pkgs: pkg
+    // }
+    
+
+  // }
+// }
+
+console.log({data, result, tracker})
+
+// 4.0 Transform tracker object and sort data
+// -- extract usernames from tracker object into an array and sort
+// -- loop through the usernames
+// -- access the package names from the tracker object with the username and sort
+// -- create an object (see below) and push to maintainers array in step 2.0
+//
+// Output: [
+//  {
+//    username: "gaearon",
+//    packageName: ["react", ...packageNames]
+//  },
+//  ...
+// ]
 
   // get the maintainers & package names
-  for (let i = 0; i < iNeedData.length; i++) {
-    const maintainer = iNeedData[i].package.maintainers;
-    const pkg = iNeedData[i].package.name;
-    console.log({maintainer, pkg });
-    const username = maintainer.username;
-    const packages = maintainer.packageNames;
-  }
 
   // remove maintainers username duplicates
 
-  // search for the packages by maintainers username in the iNeedData array
+  // search for the packages by maintainers username in the data array
   // and add each package name to the key "packageNames" of the object 
 
   // sort alphabetically the value of the packageNames key : value(array)
