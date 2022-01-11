@@ -38,96 +38,90 @@ The results should have this structure:
  * NOTE: the parent array and each "packageNames" array should 
  * be in alphabetical order.
  */
-const fetch = require('node-fetch');
+const { default: axios } = require('axios');
 
 module.exports = async function organiseMaintainers() {
-  
-  // 1.0 Fetch data with axios
-// -- url: http://ambush-api.inyourarea.co.uk/ambush/intercept
-  const res = await fetch(
+  const res = await axios.post(
     `http://ambush-api.inyourarea.co.uk/ambush/intercept`,
     {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        url: 'https://api.npms.io/v2/search/suggestions?q=react',
-        method: 'GET',
-        return_payload: true,
-      }),
+      url: 'https://api.npms.io/v2/search/suggestions?q=react',
+      method: 'GET',
+      return_payload: true,
     },
   );
 
-  const result = await res.json();
+  const data = res.data.content;
+  // console.log({ data}) // why it comes as package: [Object] in the console
+    console.log(data)
+  // 2.0 Declare a maintainers variable with an empty Array
+  const maintainersTracker = [];
 
-  const data = result.content;
+  // 3.0 Create a tracker object
+  const tracker = {};
 
-// 2.0 Declare a maintainers variable with an empty Array
+  // 3.1 Loop through data (list of packages)
+  for (let i = 0; i < data.length; i++) {
+    // -- Access the name of the package and the array of maintainers
+    const packageContent = data[i].package;
+    const { name, maintainers } = packageContent;
 
-const maintainers = [];
+    // 3.2 Loop through the array of maintainers
+    for (let j = 0; j < maintainers.length; j++) {
+      const maintainer = maintainers[i];
+      const { username } = maintainer;
+      // -- Check the tracker object in step 3.0
 
-// 3.0 Create a tracker object
-const tracker = { 
-  username : "",
-  pkgs: []
-}
+      if (tracker[username]) {
+        // -- IF the username EXISTS add the name of the package from step 3.1
+        const exisitingPackages = tracker[username];
+        tracker[username] = [...exisitingPackages, name];
+      } else {
+        // -- IF the username DOES NOT EXIST store the username with an array and the name of the package from step 3.1
+        tracker[username] = [name];
+      }
+    }
+  }
 
-// 3.1 Loop through data (list of packages)
-// -- Access the name of the package and the array of maintainers
-// for (let i = 0; i < data.length; i++) {
-//   const packageName = data[i].name;
-//   const maintainers = data[i].maintainers;
-//   console.log({packageName, maintainers});
-  // 3.2 Loop through the array of maintainers
-  // -- Check the tracker object in step 3.0
-  // -- IF the username EXISTS add the name of the package from step 3.1
-  // -- IF the username DOES NOT EXIST store the username with an array and the name of the package from step 3.1
+  console.log(Object.keys(tracker).sort());
 
-  // Output: {
-  //   gaearon: ["react", ...packageNames],
-  //   acdlite: ["react", ...packageNames],
-  // }
 
-  // for(let j = 0; j < maintainers.length; j++){ 
+  for(const maintainer in tracker){ 
+    maintainersTracker.push({
+      username: maintainer,
+      packageNames: tracker[maintainer]
+    })
+  }
 
-  //   const username = maintainers[i].username
-  //   console.log({username})
+  console.log(maintainersTracker)
 
-    // tracker[username]= { 
-    //   username : username,
-    //   pkgs: pkg
-    // }
-    
+  // 4.0 Transform tracker object and sort data
 
-  // }
-// }
-
-console.log({data, result, tracker})
-
-// 4.0 Transform tracker object and sort data
-// -- extract usernames from tracker object into an array and sort
-// -- loop through the usernames
-// -- access the package names from the tracker object with the username and sort
-// -- create an object (see below) and push to maintainers array in step 2.0
-//
-// Output: [
-//  {
-//    username: "gaearon",
-//    packageName: ["react", ...packageNames]
-//  },
-//  ...
-// ]
+  // -- extract usernames from tracker object into an array and sort
+  // -- loop through the usernames
+  // -- access the package names from the tracker object with the username and sort
+  // -- create an object (see below) and push to maintainers array in step 2.0
 
   // get the maintainers & package names
 
   // remove maintainers username duplicates
 
   // search for the packages by maintainers username in the data array
-  // and add each package name to the key "packageNames" of the object 
+  // and add each package name to the key "packageNames" of the object
 
   // sort alphabetically the value of the packageNames key : value(array)
 
-
-  return maintainers
+  return maintainers;
 };
+
+
+// package: {
+//   name: 'react-dom',
+//   scope: 'unscoped',
+//   version: '17.0.2',
+//   description: 'React package for working with the DOM.',
+//   keywords: [Array],
+//   date: '2021-03-22T21:56:33.089Z',
+//   links: [Object],
+//   publisher: [Object], // response come under this format
+//   maintainers: [Array] //  
+// },
