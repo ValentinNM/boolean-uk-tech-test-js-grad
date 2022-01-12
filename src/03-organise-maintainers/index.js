@@ -85,9 +85,6 @@ module.exports = async function organiseMaintainers() {
   }
 
   // 4.0 Transform tracker object sort data
-  
-  // console.log(Object.keys(tracker).sort());
-
   for (const maintainer in tracker) { // push to maintainers array in step 2.0
     maintainersTracker.push({ // -- extract usernames from tracker object into an array
       username: maintainer,
@@ -96,7 +93,6 @@ module.exports = async function organiseMaintainers() {
   }
 
   // -- loop through the usernames
-  // -- access the package names from the tracker object with the username and sort
   const sortedMaintainers = maintainersTracker.sort((a, b) => { // sort the usernames from extraction
     if (a.username < b.username) return -1;  // if swapping return values the sort will reverse from z->a
     // however if just changing the sign to >` instead, will have the same effect
@@ -108,11 +104,11 @@ module.exports = async function organiseMaintainers() {
   //   a.username.localeCompare(b.username),
   // );
 
-  const sortingAll = sortedMaintainers.map(maintainer => ({ // finally sorting the names of the packages
+  // -- access the package names from the tracker object with the username and sort the packages
+  const sortingAll = sortedMaintainers.map(maintainer => ({
     ...maintainer,
-    packageNames: maintainer.packageNames.sort() 
+    packageNames: maintainer.packageNames.sort() // sorting the packages names asc
   })
-  
   )
 
   const maintainers = sortingAll // storing value to maintainers
