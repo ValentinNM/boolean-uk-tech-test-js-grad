@@ -38,6 +38,7 @@ The results should have this structure:
  * NOTE: the parent array and each "packageNames" array should 
  * be in alphabetical order.
  */
+
 const { default: axios } = require('axios');
 
 module.exports = async function organiseMaintainers() {
@@ -52,7 +53,8 @@ module.exports = async function organiseMaintainers() {
 
   const data = res.data.content;
   // console.log({ data}) // why it comes as package: [Object] in the console
-    console.log(data)
+  // console.log(data)
+
   // 2.0 Declare a maintainers variable with an empty Array
   const maintainersTracker = [];
 
@@ -67,7 +69,7 @@ module.exports = async function organiseMaintainers() {
 
     // 3.2 Loop through the array of maintainers
     for (let j = 0; j < maintainers.length; j++) {
-      const maintainer = maintainers[i];
+      const maintainer = maintainers[j];
       const { username } = maintainer;
       // -- Check the tracker object in step 3.0
 
@@ -82,46 +84,35 @@ module.exports = async function organiseMaintainers() {
     }
   }
 
-  console.log(Object.keys(tracker).sort());
+  // 4.0 Transform tracker object sort data
+  
+  // console.log(Object.keys(tracker).sort());
 
-
-  for(const maintainer in tracker){ 
-    maintainersTracker.push({
+  for (const maintainer in tracker) { // push to maintainers array in step 2.0
+    maintainersTracker.push({ // -- extract usernames from tracker object into an array
       username: maintainer,
-      packageNames: tracker[maintainer]
-    })
+      packageNames: tracker[maintainer],
+    });
   }
 
-  console.log(maintainersTracker)
-
-  // 4.0 Transform tracker object and sort data
-
-  // -- extract usernames from tracker object into an array and sort
   // -- loop through the usernames
   // -- access the package names from the tracker object with the username and sort
-  // -- create an object (see below) and push to maintainers array in step 2.0
+  const sortedMaintainers = maintainersTracker.sort((a, b) => { // sort the usernames from extraction
+    if (a.username < b.username) return -1;  // if swapping return values the sort will reverse from z->a
+    // however if just changing the sign to >` instead, will have the same effect
+    return 1;
+  });
 
-  // get the maintainers & package names
+  console.log({sortedMaintainers})
 
-  // remove maintainers username duplicates
+  const sortingAll = sortedMaintainers.map(maintainer => ({ // finally sorting the names of the packages
+    ...maintainer,
+    packageNames: maintainer.packageNames.sort() 
+  })
+  
+  )
 
-  // search for the packages by maintainers username in the data array
-  // and add each package name to the key "packageNames" of the object
-
-  // sort alphabetically the value of the packageNames key : value(array)
+  const maintainers = sortingAll // storing value to maintainers
 
   return maintainers;
 };
-
-
-// package: {
-//   name: 'react-dom',
-//   scope: 'unscoped',
-//   version: '17.0.2',
-//   description: 'React package for working with the DOM.',
-//   keywords: [Array],
-//   date: '2021-03-22T21:56:33.089Z',
-//   links: [Object],
-//   publisher: [Object], // response come under this format
-//   maintainers: [Array] //  
-// },
