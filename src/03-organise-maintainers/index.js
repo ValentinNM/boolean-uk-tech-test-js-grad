@@ -103,7 +103,10 @@ module.exports = async function organiseMaintainers() {
     return 1;
   });
 
-  console.log({sortedMaintainers})
+  //  ALTERNATIVE OF THE ABOVE
+  // const sortedMaintainers = maintainersTracker.sort((a, b) =>
+  //   a.username.localeCompare(b.username),
+  // );
 
   const sortingAll = sortedMaintainers.map(maintainer => ({ // finally sorting the names of the packages
     ...maintainer,
